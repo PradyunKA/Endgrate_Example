@@ -1,0 +1,13 @@
+body {
+    font-style: italic;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: lightblue;
+}
+
+/* Styling for feedback items added dynamically */
+.feedback-item {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
