@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Integration Home Page</title>
-    <!-- Bootstrap CSS for styling, optional -->
+    <!-- Bootstrap CSS for styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
         <h1>Welcome to Our Integration Service</h1>
-        <p>Click the button below to start the integration process.</p>
+        <p>Click the buttons below to start the integration process or view data.</p>
         <form action="/auth" method="GET" target="_blank">
-            <button type="submit" class="btn btn-primary">Start Integration</button>
+            <button type="submit" class="btn btn-primary mb-3">Start Integration</button>
+        </form>
+        <!-- New button to view data -->
+        <form action="/view-data" method="GET">
+            <button type="submit" class="btn btn-secondary">View Data</button>
         </form>
     </div>
 
