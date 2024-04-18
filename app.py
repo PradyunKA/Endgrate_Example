@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env file
 
 
-SECRET_KEY = "41047db087918d81d34114ddb6047a81"
-ENDGRATE_API_KEY = "5f2d12be-993a-42c0-957c-e3412640c485"
-APPLICATION_URL = "https://94d9-108-255-199-108.ngrok-free.app"
+SECRET_KEY = "SECRET_KEY"
+ENDGRATE_API_KEY = "ENDGRATE_API_KEY"
+APPLICATION_URL = "APPLICATION_URL"
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
