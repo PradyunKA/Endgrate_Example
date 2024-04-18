@@ -51,6 +51,34 @@ def get_endgrate_data():
     response = requests.get(url, headers={"accept": "application/json","authorization": f"Bearer {ENDGRATE_API_KEY}"})
     data = response.json()
 
+    print(f"Data Retrieved: {data}")  # Check the data fetched
+
+    formatted_data = []
+    if 'transfer_data' in data:
+        for item in data['transfer_data']:
+            entry = item['data']
+            # Flatten email addresses (assuming only one per entry for simplicity)
+            email_info = entry['email_addresses'][0] if entry['email_addresses'] else {}
+            formatted_data.append({
+                'email_address': email_info.get('email_address', 'N/A'),
+                'email_type': email_info.get('email_type', 'N/A'),
+                'first_name': entry['name'].split()[0] if 'name' in entry and entry['name'] else 'N/A',
+                'last_name': entry['name'].split()[1] if 'name' in entry and len(entry['name'].split()) > 1 else 'N/A',
+                'is_active': 'Yes' if entry.get('is_active', False) else 'No'
+            })
+    else:
+        print("No transfer_data found")
+
+    return formatted_data 
+
+@app.route('/view-data')
+def view_data():
+    data = get_endgrate_data()  # Fetch and format data using your function
+    print(f"Formatted Data sent to template: {data}")  # Debug to see what's sent to the frontend
+    return render_template('data_display.html', data=data)
+
+
+
 
 @app.route('/auth')
 def auth():
