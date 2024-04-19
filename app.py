@@ -3,22 +3,22 @@ import requests
 import os
 from dotenv import load_dotenv
 
+# Load environment variables from a .env file
+load_dotenv()
 
+# Retrieve environment variables
+SECRET_KEY = os.getenv("SECRET_KEY")
+ENDGRATE_API_KEY = os.getenv("ENDGRATE_API_KEY")
+APPLICATION_URL = os.getenv("APPLICATION_URL")
 
-load_dotenv()  # Load environment variables from .env file
-
-
-SECRET_KEY = "SECRET_KEY"
-ENDGRATE_API_KEY = "ENDGRATE_API_KEY"
-APPLICATION_URL = "APPLICATION_URL"
-
+# Initialize Flask app
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
+# Configuration for initiating a session with Endgrate API
 payload = {
-    "configuration_webhook": { "endpoint": f"{APPLICATION_URL}callback" },
+    "configuration_webhook": {"endpoint": f"{APPLICATION_URL}callback"},
     "provider": "googlesheets",
-    "schema": [{ "endgrate_type": "database-user" }]
+    "schema": [{"endgrate_type": "database-user"}]
 }
 headers = {
     "accept": "application/json",
@@ -26,12 +26,14 @@ headers = {
     "authorization": f"Bearer {ENDGRATE_API_KEY}"
 }
 
+# Request to initiate a session with Endgrate
 url = "https://endgrate.com/api/session/initiate"
 response = requests.post(url, json=payload, headers=headers)
 response_data = response.json()
 ENDGRATE_SESSION_ID = response_data.get('session_id')
 print(f"Endgrate Session ID: {ENDGRATE_SESSION_ID}")
 
+# Function to fetch data from Endgrate API based on the session
 def get_endgrate_data():
     payload = {
         "session_id": ENDGRATE_SESSION_ID,
@@ -44,20 +46,22 @@ def get_endgrate_data():
         "authorization": f"Bearer {ENDGRATE_API_KEY}"
     }
 
+    # Request to transfer data from Google Sheets
     response = requests.post("https://endgrate.com/api/pull/transfer", json=payload, headers=headers)
     transfer_id = response.json()["transfer_id"]
 
+    # Fetch the actual data using the transfer ID
     url = f"https://endgrate.com/api/pull/data?endgrate_type=database-user&transfer_id={transfer_id}"
-    response = requests.get(url, headers={"accept": "application/json","authorization": f"Bearer {ENDGRATE_API_KEY}"})
+    response = requests.get(url, headers={"accept": "application/json", "authorization": f"Bearer {ENDGRATE_API_KEY}"})
     data = response.json()
 
-    print(f"Data Retrieved: {data}")  # Check the data fetched
+    print(f"Data Retrieved: {data}")
 
+    # Format the data for display
     formatted_data = []
     if 'transfer_data' in data:
         for item in data['transfer_data']:
             entry = item['data']
-            # Flatten email addresses (assuming only one per entry for simplicity)
             email_info = entry['email_addresses'][0] if entry['email_addresses'] else {}
             formatted_data.append({
                 'email_address': email_info.get('email_address', 'N/A'),
@@ -71,24 +75,24 @@ def get_endgrate_data():
 
     return formatted_data 
 
+# Route to display data fetched from Endgrate
 @app.route('/view-data')
 def view_data():
-    data = get_endgrate_data()  # Fetch and format data using your function
-    print(f"Formatted Data sent to template: {data}")  # Debug to see what's sent to the frontend
+    data = get_endgrate_data()
+    print(f"Formatted Data sent to template: {data}")
     return render_template('data_display.html', data=data)
 
-
-
-
+# Route to authenticate and start a session with Endgrate
 @app.route('/auth')
 def auth():
     global ENDGRATE_SESSION_ID
     return redirect(f"https://endgrate.com/session?session_id={ENDGRATE_SESSION_ID}")
 
-
+# Home route to serve the main page
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# Main function to run the Flask app
 if __name__ == '__main__':
     app.run(debug=True)
